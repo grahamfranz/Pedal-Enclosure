@@ -80,7 +80,7 @@ board_screw_margin    = 4;    // from inner wall corner to standoff centre — m
 board_pilot_d         = 2.7;  // M3 self-tap pilot drilled up into the standoff
 
 /* [Top: Knobs] */
-num_knobs          = 2;    // number of knobs (layout automatically wraps to multiple rows as needed)
+num_knobs          = (preset == "1590A") ? 2 : 3;  // auto-adjust for tight 1590A, override in Customizer if needed
 knob_hole_d        = 7.5;   // 3/8" pot bushing clearance
 knob_spacing       = 20;    // center-to-center distance between knob holes (static, doesn't scale)
 knob_row_spacing   = 18;    // center-to-center vertical distance between knob rows
