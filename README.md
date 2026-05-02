@@ -71,7 +71,7 @@ The Customizer provides sections for fine-tuning:
 - **[Screw Mounting]** - Boss type (on/off), diameter, inset, clearances, counterbores, and fastener type (`self_tap`, `hex_nut`, `square_nut`)
 - **[Lid Locating Lip]** - A raised plug on the lid that drops into the enclosure cavity, preventing lid shear under foot pressure
 - **[Board Mount]** - Standoff diameter and height (optional posts hanging from the top wall for proto board mounting)
-- **[Top: Knobs]** - Number, spacing, hole diameter
+- **[Top: Knobs]** - Number of knobs (auto-distributes across rows), center-to-center spacing, hole diameter, row spacing
 - **[Top: Footswitch]** - Hole size and position
 - **[Top: LED]** - Hole diameter and position (optional)
 - **[Sides: Audio Jacks]** - Hole sizes and heights
@@ -141,7 +141,7 @@ All preset Hammond enclosures are available as pre-rendered STLs in the `renders
 | **1590BB** | 119 × 94 × 34 | `1590BB_enclosure.stl` | `1590BB_lid.stl` | `1590BB_both.stl` |
 | **125B** | 121 × 66 × 39 | `125B_enclosure.stl` | `125B_lid.stl` | `125B_both.stl` |
 
-**Note**: The 1590A preset uses 2 knobs (optimized for the tight 38.5mm width), while all other presets use 3 knobs.
+**Note**: All presets default to 3 knobs. You can customize `num_knobs` in the Customizer for any preset — the layout automatically wraps to multiple rows as needed.
 
 ### Quick Print Guide
 
@@ -181,15 +181,13 @@ Pedal-Enclosure/
 - Increase `facets` from 72 to 96 or higher (slower render)
 
 ### More Knobs
-- Increase `num_knobs` and adjust `knob_side_margin` for spacing
+- Increase `num_knobs` to any value. The layout automatically wraps knobs to multiple rows based on enclosure width
+- Adjust `knob_spacing` (center-to-center distance) and `knob_row_spacing` (vertical gap between rows) as needed
+- Rows with different knob counts are horizontally centered (staggered effect); rows with the same count align vertically
 
 ### Hide Optional Components
 - Set `include_led` to `false` to remove the LED hole
 - Set `include_dc_jack` to `false` to remove the DC jack
-
-## License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
 ## Contributing
 

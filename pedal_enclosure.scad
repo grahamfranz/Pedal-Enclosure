@@ -22,8 +22,6 @@
  *
  *  Tweak everything in the Customizer panel (Window > Customizer
  *  in OpenSCAD) or edit the variables below.
- *
- *  License: public domain / CC0
  * ============================================================ */
 
 /* [Preset] */
@@ -82,11 +80,12 @@ board_screw_margin    = 4;    // from inner wall corner to standoff centre — m
 board_pilot_d         = 2.7;  // M3 self-tap pilot drilled up into the standoff
 
 /* [Top: Knobs] */
-// Automatically adjust knob count for tight enclosures (1590A uses 2 knobs, others use 3)
-num_knobs          = (preset == "1590A") ? 2 : 3;
+num_knobs          = (preset == "1590A") ? 2 : 3;  // auto-adjust for tight 1590A, override in Customizer if needed
 knob_hole_d        = 7.5;   // 3/8" pot bushing clearance
-knob_row_from_back = 18;    // distance of knob row from +X wall
-knob_side_margin   = 13;    // distance from first/last knob to long side
+knob_spacing       = 20;    // center-to-center distance between knob holes (static, doesn't scale)
+knob_row_spacing   = 18;    // center-to-center vertical distance between knob rows
+knob_row_from_back = 18;    // distance of first (topmost) knob row from +X wall
+knob_side_margin   = 13;    // distance from first/last knob to long side (Y axis)
 
 /* [Top: Footswitch] */
 footswitch_hole_d     = 12.5;  // 12 mm stomp switch
@@ -162,6 +161,43 @@ function _board_standoff_points() = [
     [L - wall_thickness - board_screw_margin, W - wall_thickness - board_screw_margin      ]
 ];
 
+// Multi-row knob layout helpers.
+// Calculate how many knobs fit in one row given available width.
+function _knobs_per_row() =
+    num_knobs == 0 ? 0 :
+    let(available_width = W - 2 * knob_side_margin)
+    floor((available_width + knob_spacing) / knob_spacing);
+
+// Calculate the actual row spacing, auto-reducing if enclosure is too short.
+function _effective_knob_row_spacing() =
+    let(kpr = _knobs_per_row(),
+        num_rows = kpr == 0 ? 0 : ceil(num_knobs / kpr))
+    num_rows <= 1 ? knob_row_spacing :
+    let(available_length = L - knob_row_from_back - led_from_front - knob_hole_d/2 - led_hole_d/2 - 5,
+        max_spacing = available_length / max(1, num_rows - 1))
+    min(knob_row_spacing, max_spacing);  // Use calculated spacing if smaller
+
+// Return list of [x, y, row, col] for each knob position.
+function _knob_positions() =
+    let(kpr = _knobs_per_row(),
+        available_width = W - 2 * knob_side_margin,
+        effective_spacing = _effective_knob_row_spacing())
+    kpr == 0 ? [] :
+    [for (i = [0 : num_knobs - 1])
+        let(row = floor(i / kpr),
+            col = i - row * kpr,
+            knobs_in_row = min(kpr, num_knobs - row * kpr),
+            // Width occupied by knobs in this row
+            row_width = (knobs_in_row - 1) * knob_spacing,
+            // Center offset to align row to enclosure
+            row_offset_y = (available_width - row_width) / 2,
+            // Y position (centered per row, then add side margin)
+            yk = knob_side_margin + row_offset_y + col * knob_spacing,
+            // X position (from back, accounting for row with effective spacing)
+            xk = L - knob_row_from_back - row * effective_spacing)
+        [xk, yk, row, col]
+    ];
+
 // A cylinder pointing in +X, +Y, -X or -Y — handy for side cutouts.
 module hole_thru_y_plus(x, z, d) {            // pokes through +Y wall
     translate([x, W - wall_thickness - 1, z])
@@ -226,15 +262,10 @@ module enclosure() {
                 translate([p[0], p[1], H - wall_thickness - board_standoff_height - EPS])
                     cylinder(d = board_pilot_d, h = 5 + EPS);
 
-        // Knob row (top face).
-        knob_span    = W - 2 * knob_side_margin;
-        knob_spacing = num_knobs > 1 ? knob_span / (num_knobs - 1) : 0;
-        for (i = [0 : num_knobs - 1]) {
-            yk = num_knobs > 1
-                ? knob_side_margin + i * knob_spacing
-                : W / 2;
-            translate([L - knob_row_from_back, yk,
-                       H - wall_thickness - 1])
+        // Multi-row knob layout (top face).
+        knob_pos = _knob_positions();
+        for (pos = knob_pos) {
+            translate([pos[0], pos[1], H - wall_thickness - 1])
                 cylinder(d = knob_hole_d, h = wall_thickness + 2);
         }
 
