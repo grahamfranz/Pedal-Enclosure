@@ -22,8 +22,6 @@
  *
  *  Tweak everything in the Customizer panel (Window > Customizer
  *  in OpenSCAD) or edit the variables below.
- *
- *  License: public domain / CC0
  * ============================================================ */
 
 /* [Preset] */
