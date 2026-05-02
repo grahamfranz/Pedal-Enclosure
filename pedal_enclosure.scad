@@ -173,9 +173,9 @@ function _effective_knob_row_spacing() =
     let(kpr = _knobs_per_row(),
         num_rows = kpr == 0 ? 0 : ceil(num_knobs / kpr))
     num_rows <= 1 ? knob_row_spacing :
-    let(available_length = L - wall_thickness - knob_row_from_back - footswitch_from_front - knob_hole_d / 2,
-        max_spacing = available_length / (num_rows - 1))
-    min(knob_row_spacing, max(8, max_spacing));  // Keep minimum of 8mm spacing
+    let(available_length = L - knob_row_from_back - led_from_front - knob_hole_d/2 - led_hole_d/2 - 5,
+        max_spacing = available_length / max(1, num_rows - 1))
+    min(knob_row_spacing, max_spacing);  // Use calculated spacing if smaller
 
 // Return list of [x, y, row, col] for each knob position.
 function _knob_positions() =
