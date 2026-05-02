@@ -168,10 +168,20 @@ function _knobs_per_row() =
     let(available_width = W - 2 * knob_side_margin)
     floor((available_width + knob_spacing) / knob_spacing);
 
+// Calculate the actual row spacing, auto-reducing if enclosure is too short.
+function _effective_knob_row_spacing() =
+    let(kpr = _knobs_per_row(),
+        num_rows = kpr == 0 ? 0 : ceil(num_knobs / kpr))
+    num_rows <= 1 ? knob_row_spacing :
+    let(available_length = L - wall_thickness - knob_row_from_back - footswitch_from_front - knob_hole_d / 2,
+        max_spacing = available_length / (num_rows - 1))
+    min(knob_row_spacing, max(8, max_spacing));  // Keep minimum of 8mm spacing
+
 // Return list of [x, y, row, col] for each knob position.
 function _knob_positions() =
     let(kpr = _knobs_per_row(),
-        available_width = W - 2 * knob_side_margin)
+        available_width = W - 2 * knob_side_margin,
+        effective_spacing = _effective_knob_row_spacing())
     kpr == 0 ? [] :
     [for (i = [0 : num_knobs - 1])
         let(row = floor(i / kpr),
@@ -183,8 +193,8 @@ function _knob_positions() =
             row_offset_y = (available_width - row_width) / 2,
             // Y position (centered per row, then add side margin)
             yk = knob_side_margin + row_offset_y + col * knob_spacing,
-            // X position (from back, accounting for row)
-            xk = L - knob_row_from_back - row * knob_row_spacing)
+            // X position (from back, accounting for row with effective spacing)
+            xk = L - knob_row_from_back - row * effective_spacing)
         [xk, yk, row, col]
     ];
 
