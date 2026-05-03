@@ -100,6 +100,8 @@ led_from_front = 45;
 input_jack_d         = 9.5;   // 1/4" enclosed jack
 output_jack_d        = 9.5;
 jack_height_from_lid = 15;    // centre height above the lid seat
+jack_x_offset        = 0;     // symmetric offset in mm; positive = input forward, output back
+                              // typical range: ±15 mm (beyond ±20 mm risks hitting walls/bosses)
 
 /* [Back: DC Jack] */
 include_dc_jack        = true;
@@ -282,8 +284,8 @@ module enclosure() {
 
         // Audio jacks (centred along X on the long sides).
         jz = lid_thickness + jack_height_from_lid;
-        hole_thru_y_plus (L / 2, jz, input_jack_d);
-        hole_thru_y_minus(L / 2, jz, output_jack_d);
+        hole_thru_y_plus (L / 2 - jack_x_offset, jz, input_jack_d);
+        hole_thru_y_minus(L / 2 + jack_x_offset, jz, output_jack_d);
 
         // DC jack (back / +X wall).
         if (include_dc_jack)
