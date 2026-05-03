@@ -74,7 +74,7 @@ The Customizer provides sections for fine-tuning:
 - **[Top: Knobs]** - Number of knobs (auto-distributes across rows), center-to-center spacing, hole diameter, row spacing
 - **[Top: Footswitch]** - Hole size and position
 - **[Top: LED]** - Hole diameter and position (optional)
-- **[Sides: Audio Jacks]** - Hole sizes and heights
+- **[Sides: Audio Jacks]** - Hole sizes, heights, and symmetric offset to prevent jack hardware collision
 - **[Back: DC Jack]** - Hole size and height (optional)
 
 ### Coordinate System
@@ -184,6 +184,12 @@ Pedal-Enclosure/
 - Increase `num_knobs` to any value. The layout automatically wraps knobs to multiple rows based on enclosure width
 - Adjust `knob_spacing` (center-to-center distance) and `knob_row_spacing` (vertical gap between rows) as needed
 - Rows with different knob counts are horizontally centered (staggered effect); rows with the same count align vertically
+
+### Offset Audio Jacks
+- Use `jack_x_offset` to prevent 1/4" jack connectors from colliding (typical range: ±15 mm)
+- Positive values move the input jack forward and output jack back
+- Negative values reverse the direction
+- Useful for compact builds where jack hardware extends into the enclosure
 
 ### Hide Optional Components
 - Set `include_led` to `false` to remove the LED hole
